@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Happy Number Game</title>
+  </head>
+  <body>
+    <input id="number1" />
+    <input id="number2"/>
+    <input id="number3"/>
+    <div id="messageBoard"></div>
+    <div id="triesBoard"></div>
+    <button onClick=isThisComboHappy()>Submit</button>
+    <button onClick=giveUp()>I give up!</button>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+    })
+    function factorial(num) {
+      if (num === 0 || num === 1) {
+        return 1;
+      }
+      let total = 1;
+      for(let i = 1; i <= num; i++) {
+        total = total * i;
+      }
+      return total;
+    }
+
+    let tries = 0;
+    function isThisComboHappy() {
+      const val1 = $("#number1").val();
+      const val2 = $("#number2").val();
+      const val3 = $("#number3").val();
+      if(!val1 || !val2 || !val3) {
+        $("#messageBoard").text('Please enter a value in each field');
+        return;
+      }
+      tries++
+      $("#triesBoard").text(`Tries: ${tries}`);
+      const val1Factorial = factorial(val1);
+      const val2Factorial = factorial(val2);
+      const val3Factorial = factorial(val3);
+      const concat = parseInt(`${val1}${val2}${val3}`);
+      const sum = val1Factorial + val2Factorial + val3Factorial;
+      if (concat === sum) {
+        $("#messageBoard").text('YAY! A happy number');
+      } else {
+        $("#messageBoard").text('NOT a happy number');
+      }
+    }
+    function giveUp() {
+      for (let i=1; i < 10; i++) {
+        for (let j=0; j < 10; j++) {
+          for (let k=0; k < 10; k++) {
+            if (factorial(i) + factorial(j) + factorial(k) === parseInt(i.toString() + j.toString() + k.toString())) {
+              $("#number1").val(i);
+              $("#number2").val(j);
+              $("#number3").val(k);
+              $("#messageBoard").text(`a=${i}, b=${j} and c=${k} is the only combination that is happy!`);
+              tries = 0;
+            }
+          }
+        }
+      }
+    }
+
+    </script>
+  </body>
+</html>
