@@ -4,19 +4,39 @@
     <title>Happy Number Game</title>
   </head>
   <body>
-    <input id="number1" />
-    <input id="number2"/>
-    <input id="number3"/>
-    <div id="messageBoard"></div>
-    <div id="triesBoard"></div>
-    <button class="ui green button" onClick=isThisComboHappy()>Submit</button>
-    <button class="ui red button" onClick=giveUp()>I give up!</button>
-
+    <div class="ui center aligned grid container raised compact segment" style="max-width: 500; margin: 0 auto">
+      <div class="eight wide column">
+        <h2>Happy Number Game</h2>
+        <!-- <h3>A happy number is one where...</h3>
+        <h3>ABC = A! + B! + C! where A > 0, B >= 0, C >= 0</h3>
+        <h3>Enter three numbers below to see if they are happy</h3> -->
+        <form class="ui form">
+          <div class="field">
+            <div class="three fields">
+              <div class="field">
+                <input type="number" min="1" id="number1" />
+              </div>
+              <div class="field">
+                <input type="number" min="0" id="number2"/>
+              </div>
+              <div class="field">
+                <input type="number" min="0" id="number3"/>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="ui compact hidden message" id="messageBoard"></div>
+        <div class="ui compact hidden message" id="triesBoard"></div>
+        <button class="ui green button fluid" onClick=isThisComboHappy()>Submit</button>
+        <button class="ui red button fluid" onClick=giveUp()>I give up!</button>
+      </div>
+    </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
     <script>
     $(document).ready(function() {
+
     })
     function factorial(num) {
       if (num === 0 || num === 1) {
@@ -35,20 +55,33 @@
       const val2 = $("#number2").val();
       const val3 = $("#number3").val();
       if(!val1 || !val2 || !val3) {
-        $("#messageBoard").text('Please enter a value in each field');
+        $("#messageBoard")
+          .text('Please enter a value in each field')
+          .removeClass("hidden")
+          .addClass("visible negative")
         return;
       }
       tries++
-      $("#triesBoard").text(`Tries: ${tries}`);
+      $("#triesBoard")
+        .removeClass("hidden")
+        .addClass("visible positive")
+        .text(`Tries: ${tries}`);
       const val1Factorial = factorial(val1);
       const val2Factorial = factorial(val2);
       const val3Factorial = factorial(val3);
       const concat = parseInt(`${val1}${val2}${val3}`);
       const sum = val1Factorial + val2Factorial + val3Factorial;
       if (concat === sum) {
-        $("#messageBoard").text('YAY! A happy number');
+        $("#messageBoard")
+          .removeClass("hidden")
+          .removeClass("negative")
+          .addClass("visible positive")
+          .text(`You've solved it! ${val1}! + ${val2}! + ${val3}! = ${val1}${val2}${val3} `)
       } else {
-        $("#messageBoard").text('NOT a happy number');
+        $("#messageBoard")
+          .removeClass("hidden")
+          .addClass("visible negative")
+          .text(`NOT a happy number.  ${val1}! + ${val2}! + ${val3}! !== ${val1}${val2}${val3}`);
       }
     }
     function giveUp() {
@@ -59,7 +92,10 @@
               $("#number1").val(i);
               $("#number2").val(j);
               $("#number3").val(k);
-              $("#messageBoard").text(`a=${i}, b=${j} and c=${k} is the only combination that is happy!`);
+              $("#messageBoard")
+                .text(`a=${i}, b=${j} and c=${k} is the only combination that is happy!`)
+                .removeClass("hidden")
+                .addClass("visible")
               tries = 0;
             }
           }
