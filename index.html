@@ -5,7 +5,7 @@
   </head>
   <body>
     <div class="ui center aligned grid container raised compact segment" style="max-width: 500; margin: 0 auto">
-      <div class="eight wide column">
+      <div class="twelve wide column">
         <h2>Happy Number Game</h2>
         <!-- <h3>A happy number is one where...</h3>
         <h3>ABC = A! + B! + C! where A > 0, B >= 0, C >= 0</h3>
@@ -27,8 +27,41 @@
         </form>
         <div class="ui compact hidden message" id="messageBoard"></div>
         <div class="ui compact hidden message" id="triesBoard"></div>
-        <button class="ui green button fluid" onClick=isThisComboHappy()>Submit</button>
+        <button class="ui green button fluid" onClick=isThisComboHappy()>Check to see if happy</button>
         <button class="ui red button fluid" onClick=giveUp()>I give up!</button>
+        <button class="ui blue button fluid" onClick=submit()>Submit Score</button>
+      </div>
+      <div class="two wide column">
+        <h2>Leaderboard</h2>
+        <button class="ui red button" onClick=logout()>Logout</button>
+      </div>
+      <div class="two wide column">
+        <form class="ui login form">
+          <h2>Login</h2>
+          <div class="field">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="youremail@email.com">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="password">
+          </div>
+          <button class="ui blue button" type="submit" onClick=login()>Login</button>
+          <p onClick="showRegister()">Register</p>
+        </form>
+        <form class="ui register form">
+          <h2>Register</h2>
+          <div class="field">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="youremail@email.com">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="password">
+          </div>
+          <button class="ui blue button" type="submit" onClick=register()>Register</button>
+          <p onClick="showLogin()">Login</p>
+        </form>
       </div>
     </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
@@ -36,7 +69,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
     <script>
     $(document).ready(function() {
-
+      $('.register').hide();
     })
     function factorial(num) {
       if (num === 0 || num === 1) {
@@ -50,6 +83,8 @@
     }
 
     let tries = 0;
+    let solved = false;
+
     function isThisComboHappy() {
       const val1 = $("#number1").val();
       const val2 = $("#number2").val();
@@ -72,6 +107,7 @@
       const concat = parseInt(`${val1}${val2}${val3}`);
       const sum = val1Factorial + val2Factorial + val3Factorial;
       if (concat === sum) {
+        solved = true;
         $("#messageBoard")
           .removeClass("hidden")
           .removeClass("negative")
@@ -103,6 +139,77 @@
       }
     }
 
+    function showLogin() {
+      $('.login').show();
+      $('.register').hide();
+    }
+
+    function showRegister() {
+      $('.register').show();
+      $('.login').hide();
+    }
+
+    function hideLoginAndRegister() {
+      $('.register').hide();
+      $('.login').hide();
+    }
+
+    function submit() {
+      const gameInfo = {
+        date: new Date(),
+        turns,
+        solved,
+      }
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:3000/user', true);
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+      xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+              alert(xhr.response);
+          }
+      }
+      xhr.send(JSON.stringify(gameInfo));
+    }
+    function login() {
+      event.preventDefault();
+      $form = $('.login')
+      const allFields = $form.form('get values');
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:3000/login', true);
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+      xhr.onreadystatechange = function () {
+        console.log(xhr);
+          if (xhr.status === 200) {
+            localStorage.setItem('loggedIn', 'true');
+            hideLoginAndRegister();
+          } else {
+            alert('Incorrect credentials');
+          }
+      }
+      xhr.send(JSON.stringify(allFields));
+    }
+    function register() {
+      event.preventDefault();
+      $form = $('.register')
+      const allFields = $form.form('get values');
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:3000/register', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onreadystatechange = function () {
+        if (xhr.status === 200) {
+          localStorage.setItem('loggedIn', 'true');
+          hideLoginAndRegister();
+        } else {
+          alert('Registration failed.');
+        }
+      }
+      xhr.send(JSON.stringify(allFields));
+    }
     </script>
   </body>
 </html>
