@@ -4,65 +4,73 @@
     <title>Happy Number Game</title>
   </head>
   <body>
-    <div class="ui center aligned grid container raised compact segment" style="max-width: 500; margin: 0 auto">
+    <div class="ui center aligned compact segment intro" style="max-width: 500; margin: 0 auto">
+      <form class="ui login form">
+        <div class="field">
+          <div class="two fields">
+            <div class="field">
+              <input type="text" name="username" placeholder="username">
+            </div>
+            <div class="field">
+              <input type="password" name="password" placeholder="password">
+            </div>
+            <button class="ui blue tiny button" type="submit" onClick=login()>Login</button>
+          </div>
+        </div>
+        <p>Need to <a onClick="showRegister()">register?</a></p>
+      </form>
+      <form class="ui register form">
+        <div class="field">
+          <div class="two fields">
+            <div class="field">
+              <input type="text" name="username" placeholder="username">
+            </div>
+            <div class="field">
+              <input type="password" name="password" placeholder="password">
+            </div>
+          </div>
+        </div>
+        <button class="ui tiny blue button" type="submit" onClick=register()>Register</button>
+        <p>Need to <a onClick="showLogin()">login?</a></p>
+      </form>
+    </div>
+    <div class="ui center aligned grid container raised compact segment" style="max-width: 500; margin: 10px auto">
       <div class="twelve wide column">
         <h2>Happy Number Game</h2>
-        <!-- <h3>A happy number is one where...</h3>
-        <h3>ABC = A! + B! + C! where A > 0, B >= 0, C >= 0</h3>
-        <h3>Enter three numbers below to see if they are happy</h3> -->
         <form class="ui form">
           <div class="field">
             <div class="three fields">
               <div class="field">
-                <input type="number" min="1" id="number1" />
+                <input type="number" min="1" id="number1" placeholder="3">
               </div>
               <div class="field">
-                <input type="number" min="0" id="number2"/>
+                <input type="number" min="0" id="number2" placeholder="2"/>
               </div>
               <div class="field">
-                <input type="number" min="0" id="number3"/>
+                <input type="number" min="0" id="number3" placeholder="1"/>
               </div>
             </div>
           </div>
         </form>
         <div class="ui compact hidden message" id="messageBoard"></div>
         <div class="ui compact hidden message" id="triesBoard"></div>
-        <button class="ui green button fluid" onClick=isThisComboHappy()>Check to see if happy</button>
-        <button class="ui red button fluid" onClick=giveUp()>I give up!</button>
-        <button class="ui blue button fluid" onClick=submit()>Submit Score</button>
+        <div class="ui buttons">
+          <button class="ui green button" onClick=isThisComboHappy()>Test</button>
+          <button class="ui red button" onClick=giveUp()>I give up!</button>
+          <button class="ui blue button submitScore" onClick=submit()>Submit Score</button>
+        </div>
       </div>
-      <div class="two wide column">
-        <h2>Leaderboard</h2>
-        <button class="ui red button" onClick=logout()>Logout</button>
-      </div>
-      <div class="two wide column">
-        <form class="ui login form">
-          <h2>Login</h2>
-          <div class="field">
-            <label>Username</label>
-            <input type="text" name="username" placeholder="youremail@email.com">
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <input type="password" name="password" placeholder="password">
-          </div>
-          <button class="ui blue button" type="submit" onClick=login()>Login</button>
-          <p onClick="showRegister()">Register</p>
-        </form>
-        <form class="ui register form">
-          <h2>Register</h2>
-          <div class="field">
-            <label>Username</label>
-            <input type="text" name="username" placeholder="youremail@email.com">
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <input type="password" name="password" placeholder="password">
-          </div>
-          <button class="ui blue button" type="submit" onClick=register()>Register</button>
-          <p onClick="showLogin()">Login</p>
-        </form>
-      </div>
+    </div>
+    <div class="ui center aligned raised segment leaderboard" style="max-width: 500px; margin: 10px auto">
+      <h2>Game History</h2>
+      <table class="ui selectable celled table tableData">
+        <tr>
+          <th>Date</th>
+          <th>Solved</th>
+          <th>Turns</th>
+        </tr>
+      </table>
+      <button class="ui red button" onClick=logout()>Logout</button>
     </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -70,7 +78,10 @@
     <script>
     $(document).ready(function() {
       $('.register').hide();
+      $('.leaderboard').hide();
+      $('.submitScore').hide();
     })
+
     function factorial(num) {
       if (num === 0 || num === 1) {
         return 1;
@@ -150,14 +161,38 @@
     }
 
     function hideLoginAndRegister() {
+      $('.intro').hide();
       $('.register').hide();
       $('.login').hide();
+      $('.leaderboard').show();
+      $('.submitScore').show();
+      $('.login, .register')[0].reset();
+    }
+
+    function showLoginAndRegister() {
+      $('.intro').show();
+      $('.register').hide();
+      $('.login').show();
+      $('.submitScore').hide();
+      $('.leaderboard').hide();
+    }
+
+    function updateLeaderboard(games) {
+      $('.starter').empty()
+      $.each(games, function (i, item) {
+        const solved = item.solved ? 'Y' : 'N';
+        $('<tr class="starter">').append(
+        $('<td>').text(item.date.split('T')[0]),
+        $('<td>').text(solved),
+        $('<td>').text(item.turns)).appendTo('.tableData');
+      })
     }
 
     function submit() {
+      const userId = localStorage.getItem('userId');
       const gameInfo = {
         date: new Date(),
-        turns,
+        turns: tries,
         solved,
       }
       var xhr = new XMLHttpRequest();
@@ -165,12 +200,23 @@
       xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
       xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-              alert(xhr.response);
+        if (xhr.status === 200) {
+
+          const res = JSON.parse(xhr.response);
+          if (res && res.games) {
+            const games = res.games;
+            updateLeaderboard(games);
           }
+        }
       }
-      xhr.send(JSON.stringify(gameInfo));
+      xhr.send(JSON.stringify({gameInfo, _id: userId}));
     }
+
+    function logout() {
+      localStorage.clear();
+      showLoginAndRegister();
+    }
+
     function login() {
       event.preventDefault();
       $form = $('.login')
@@ -181,10 +227,15 @@
       xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
       xhr.onreadystatechange = function () {
-        console.log(xhr);
           if (xhr.status === 200) {
-            localStorage.setItem('loggedIn', 'true');
-            hideLoginAndRegister();
+            const res = JSON.parse(xhr.response);
+            if (res && res._id) {
+              const userId = res._id;
+              const games = res.games;
+              localStorage.setItem('userId', userId );
+              hideLoginAndRegister();
+              updateLeaderboard(games);
+            }
           } else {
             alert('Incorrect credentials');
           }
@@ -202,8 +253,14 @@
 
       xhr.onreadystatechange = function () {
         if (xhr.status === 200) {
-          localStorage.setItem('loggedIn', 'true');
-          hideLoginAndRegister();
+          const res = JSON.parse(xhr.response);
+          if (res && res._id) {
+            const userId = res._id;
+            const games = res.games;
+            localStorage.setItem('userId', userId );
+            hideLoginAndRegister();
+            updateLeaderboard(games);
+          }
         } else {
           alert('Registration failed.');
         }
