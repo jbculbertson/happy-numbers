@@ -188,6 +188,7 @@
       })
     }
 
+    const BASE_URL = 'https://happy-numbers-api.herokuapp.com';
     function submit() {
       const userId = localStorage.getItem('userId');
       const gameInfo = {
@@ -196,7 +197,7 @@
         solved,
       }
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:3000/user', true);
+      xhr.open('POST', `${BASE_URL}/user`, true);
       xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
       xhr.onreadystatechange = function () {
@@ -223,7 +224,7 @@
       const allFields = $form.form('get values');
 
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:3000/login', true);
+      xhr.open('POST', `${BASE_URL}/login`, true);
       xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
       xhr.onreadystatechange = function () {
@@ -248,7 +249,7 @@
       const allFields = $form.form('get values');
 
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:3000/register', true);
+      xhr.open('POST', `${BASE_URL}/register`, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onreadystatechange = function () {
